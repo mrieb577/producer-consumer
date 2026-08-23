@@ -22,13 +22,11 @@
 class Scheduler;
 
 void produce(Scheduler* scheduler);
-
-template <typename T>
 void consume(Scheduler* scheduler);
 
 class Scheduler {
 public:
-    std::chrono::_V2::system_clock::time_point start_time;
+    std::chrono::high_resolution_clock::time_point start_time;
 
     // queue of jobs, needs to be accessed with a mutex to ensure thread safety
     std::unique_ptr<Job> queue[MAX_JOBS];
