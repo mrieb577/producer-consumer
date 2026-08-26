@@ -13,6 +13,6 @@ void Fibbonacci::operator()() const {
 
 void RandWait::operator()() const {
     double len = lower + (upper - lower) * (random() % max_rand) / max_rand;
-    std::cout << "Sleeping for " << len << "ms" << std::endl;
-    sleep(len);
+    //std::cout << "Sleeping for " << len << "ms" << std::endl;
+    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(len));
 }

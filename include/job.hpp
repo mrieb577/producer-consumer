@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <unistd.h>
+#include <thread>
 
 // virtual class for Job so polymorphism
 class Job {
@@ -24,7 +25,7 @@ public:
 class RandWait : public Job {
 private:
     const long max_rand = 1000000L;
-    double upper = 5, lower = 0;
+    double upper = 100, lower = 0;
 
 public:
     RandWait() {};

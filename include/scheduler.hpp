@@ -1,10 +1,9 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#define MAX_PRODUCERS 2
-#define MAX_CONSUMERS 8
-#define ALL_THREADS (MAX_PRODUCERS + MAX_CONSUMERS)
-#define MAX_JOBS 32
+#define MAX_PRODUCERS 16
+#define MAX_CONSUMERS 16
+#define MAX_JOBS 128
 
 #include <iostream>
 #include <functional>
@@ -19,18 +18,15 @@
 
 #include "job.hpp"
 
-class Scheduler;
-
-void produce(Scheduler* scheduler);
-void consume(Scheduler* scheduler);
-
 class Scheduler {
 public:
     std::chrono::high_resolution_clock::time_point start_time;
 
     // queue of jobs, needs to be accessed with a mutex to ensure thread safety
+    // pointer for polymorphism, unique_ptr for safety
     std::unique_ptr<Job> queue[MAX_JOBS];
-    long q_in, q_out, jobs;
+    int q_in, q_out, q_size;
+    int produced_jobs, consumed_jobs;
 
     // producer and consumer threads
     std::thread producers[MAX_PRODUCERS];
@@ -38,8 +34,9 @@ public:
 
     // mutex for thread safety
     std::mutex mut;
-    std::counting_semaphore<ALL_THREADS> queueing{0};
-    std::counting_semaphore<ALL_THREADS> empty{ALL_THREADS};
+    // makes the queue a blocking queue
+    std::counting_semaphore<MAX_JOBS> queueing{0}; // amount of queueing jobs
+    std::counting_semaphore<MAX_JOBS> empty{MAX_JOBS}; // amount of empty jobs slots
 
     Scheduler();
     ~Scheduler();
@@ -56,5 +53,8 @@ public:
     bool jobQueueEmpty() const;
     bool jobQueueFull() const;
 };
+
+void produce(Scheduler* scheduler);
+void consume(Scheduler* scheduler);
 
 #endif
